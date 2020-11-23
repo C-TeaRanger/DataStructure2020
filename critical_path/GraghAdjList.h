@@ -8,19 +8,18 @@ typedef struct EdgeNode{
 
 typedef struct VertexNode{
     int in;
-    int data;
     struct EdgeNode * firstedge;
-} VertexNode, AdjList[MAXVEX];
+} VertexNode;
 
 typedef struct{
-    AdjList adjlist;
+    VertexNode adjlist[MAXVEX];
     int numEdges, numVertexes;
-} graphAdjList, * GraphAdjList;
+} graphAdjList, * PtrGraphAdjList;
 
 typedef struct Activity{
     int from;
     int to;
-    int data;
+    int weight;
 } Activity;
 
 enum Status{
