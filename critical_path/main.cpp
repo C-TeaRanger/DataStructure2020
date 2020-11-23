@@ -61,7 +61,6 @@ void getCriticalPath(PtrGraphAdjList GL, Activity (&criticalPath)[MAX_N])
     int topoOrder[MAX_N] = {0};
     int etv[MAX_N] = {0}, ltv[MAX_N] = {0}, ete = 0, lte = 0;
     int top = 0;
-    Activity a = {0};
     
     //get topological order of graph
     topoSort(GL, topoOrder);
@@ -78,9 +77,7 @@ void getCriticalPath(PtrGraphAdjList GL, Activity (&criticalPath)[MAX_N])
             lte = ltv[e->adjvex] - e->weight;
             if (0 == lte - ete)
             {
-                a.from = i;
-                a.to = e->adjvex;
-                a.weight = e->weight;
+                Activity a = {i, e->adjvex, e->weight};
                 criticalPath[top++] = a;
             }
         }
