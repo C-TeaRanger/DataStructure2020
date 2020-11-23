@@ -1,4 +1,4 @@
-const int MAXVEX = 100;
+const int MAX_N = 100;
 
 typedef struct EdgeNode{
     int adjvex;
@@ -12,7 +12,7 @@ typedef struct VertexNode{
 } VertexNode;
 
 typedef struct{
-    VertexNode adjlist[MAXVEX];
+    VertexNode adjlist[MAX_N];
     int numEdges, numVertexes;
 } graphAdjList, * PtrGraphAdjList;
 

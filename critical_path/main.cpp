@@ -4,55 +4,75 @@
 using std::cout;
 using std::endl;
 
-const int MAX_N = 100;
+//prototypes
+Status addActivity(PtrGraphAdjList GL, Activity a);
+void getEtvAndLtv(PtrGraphAdjList GL,const int(&topoOrder)[MAX_N], int(&etv)[MAX_N], int (&ltv)[MAX_N]);
+PtrGraphAdjList newGraphAdjList(const Activity a[], int numEdges);
+Status topoSort(PtrGraphAdjList GL, int(&topoOrder)[MAX_N]);
+void getCriticalPath(PtrGraphAdjList GL, Activity (&criticalPath)[MAX_N]);
 
-PtrGraphAdjList newGraphAdjList(const Activity a[], int n)
+int main()
 {
-    //init GraghAdjList
-    PtrGraphAdjList GL = new graphAdjList();
-    for(int i = 0;i < n;i++)
+    return 0;
+}
+
+PtrGraphAdjList newGraphAdjList(const Activity a[], int numEdges)
+{
+    //init GraphAdjList
+    auto GL = new graphAdjList();
+    bool enabledVertex[MAX_N] = {};
+    for(int i = 0; i < numEdges; i++)
     {        
         GL->adjlist[i].in = 0;
-        GL->adjlist[i].data = 0;
         GL->adjlist[i].firstedge = nullptr;
     }
+    GL->numEdges = numEdges;
+    GL->numVertexes = 0;
 
     //add activities to graph
-    for(int i = 0; i < n; i++)
+    for(int i = 0; i < numEdges; i++)
     {
         addActivity(GL, a[i]);
+        enabledVertex[a[i].from] = true;
+        enabledVertex[a[i].to] = true;
     }
 
-    //calculate numEdges and numVertexes
-    GL->numEdges = n;
-    //TODO
+    //count numVertexes
+    for(bool shot : enabledVertex)
+    {
+        if(shot)
+            GL->numVertexes++;
+    }
 
     return GL;
 }
 
-void addActivity(GraghAdjList GL, Activity a)
+Status addActivity(PtrGraphAdjList GL, Activity a)
 {
     //point tmp to the last EdgeNode
-    EdgeNode * tmp = GL->adjlist[a[i].from].firstedge;
+    EdgeNode * tmp = GL->adjlist[a.from].firstedge;
+    bool isVisited[MAX_N] = {};
     while(tmp != nullptr)
-        tmp = tmp->next;  //TODO:check duplicated edge
+    {
+        //if duplicated edge visited, return error
+        if(isVisited[tmp->adjvex])
+            return ERROR;
+        isVisited[tmp->adjvex] = true;
+
+        //go to next edge
+        tmp = tmp->next;
+    }
      
-    //add activity on "from"
+    //add activity by "from"
     tmp = new EdgeNode();
     tmp->adjvex = a.to;
     tmp->weight = a.weight;
     tmp->next = nullptr;
 
-    //add activity on "to"
-    GL->adjlist[a[i].to].in += 1;
-}
+    //add activity by "to"
+    GL->adjlist[a.to].in += 1;
 
-Status topoSort(PtrGraphAdjList GL, int(&topoOrder)[MAX_N])
-{
-    int n = GL->numVertexes;
-
-
-    return ERROR;
+    return SUCCESS;
 }
 
 void getCriticalPath(PtrGraphAdjList GL, Activity (&criticalPath)[MAX_N])
@@ -62,18 +82,18 @@ void getCriticalPath(PtrGraphAdjList GL, Activity (&criticalPath)[MAX_N])
     int etv[MAX_N] = {0}, ltv[MAX_N] = {0}, ete = 0, lte = 0;
     int top = 0;
     
-    //get topological order of graph
+    //get topological order of AOE graph
     topoSort(GL, topoOrder);
 
     //get etv and ltv of aoe graph
     getEtvAndLtv(GL, topoOrder, etv,ltv);
 
-    //figure ete and lte for each edge, and update critical path
+    //figure ete and lte for each edge, and update critical path when ete == lte
     for(int i = 0; i < GL->numVertexes; i++)
     {
         for(EdgeNode * e = GL->adjlist[i].firstedge; e != nullptr; e = e->next)
         {
-            ete = etv[j];
+            ete = etv[i];
             lte = ltv[e->adjvex] - e->weight;
             if (0 == lte - ete)
             {
@@ -85,7 +105,12 @@ void getCriticalPath(PtrGraphAdjList GL, Activity (&criticalPath)[MAX_N])
 
 }
 
-void getEtvAndLtv(PtrGraphAdjList GL,const int(&topoOrder)[MAX_N], int(&etv)[MAX_N], int (&ltv)[MAX_N])
+Status topoSort(PtrGraphAdjList GL, int(&topoOrder)[MAX_N])
+{
+    return ERROR;
+}
+
+void getEtvAndLtv(PtrGraphAdjList GL, const int(&topoOrder)[MAX_N], int(&etv)[MAX_N], int (&ltv)[MAX_N])
 {
     int n = GL->numVertexes;
     for(int i = 0; i < n; i++)
@@ -103,8 +128,5 @@ void getEtvAndLtv(PtrGraphAdjList GL,const int(&topoOrder)[MAX_N], int(&etv)[MAX
     }
 }
 
-int main() 
-{
-    return 0;
-}
+
 
