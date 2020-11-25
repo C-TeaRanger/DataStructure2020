@@ -16,11 +16,11 @@ typedef struct{
     int numEdges, numVertexes;
 } graphAdjList, * PtrGraphAdjList;
 
-typedef struct Activity{
+typedef struct EdgedActivity{
     int from;
     int to;
     int weight;
-} Activity;
+} EdgedActivity;
 
 enum Status{
     SUCCESS, 

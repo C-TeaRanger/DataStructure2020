@@ -5,18 +5,18 @@ using std::cout;
 using std::endl;
 
 //prototypes
-Status addActivity(PtrGraphAdjList GL, Activity a);
+Status addActivity(PtrGraphAdjList GL, EdgedActivity a);
 void getEtvAndLtv(PtrGraphAdjList GL,const int(&topoOrder)[MAX_N], int(&etv)[MAX_N], int (&ltv)[MAX_N]);
-PtrGraphAdjList newGraphAdjList(const Activity a[], int numEdges);
+PtrGraphAdjList newGraphAdjList(const EdgedActivity a[], int numEdges);
 Status topoSort(PtrGraphAdjList GL, int(&topoOrder)[MAX_N]);
-void getCriticalPath(PtrGraphAdjList GL, Activity (&criticalPath)[MAX_N]);
+void getCriticalPath(PtrGraphAdjList GL, EdgedActivity (&criticalPath)[MAX_N]);
 
 int main()
 {
     return 0;
 }
 
-PtrGraphAdjList newGraphAdjList(const Activity a[], int numEdges)
+PtrGraphAdjList newGraphAdjList(const EdgedActivity a[], int numEdges)
 {
     //init GraphAdjList
     auto GL = new graphAdjList();
@@ -39,15 +39,14 @@ PtrGraphAdjList newGraphAdjList(const Activity a[], int numEdges)
 
     //count numVertexes
     for(bool shot : enabledVertex)
-    {
         if(shot)
-            GL->numVertexes++;
-    }
+            GL->numVertexes += 1;
+    
 
     return GL;
 }
 
-Status addActivity(PtrGraphAdjList GL, Activity a)
+Status addActivity(PtrGraphAdjList GL, EdgedActivity a)
 {
     //point tmp to the last EdgeNode
     EdgeNode * tmp = GL->adjlist[a.from].firstedge;
@@ -75,7 +74,7 @@ Status addActivity(PtrGraphAdjList GL, Activity a)
     return SUCCESS;
 }
 
-void getCriticalPath(PtrGraphAdjList GL, Activity (&criticalPath)[MAX_N])
+void getCriticalPath(PtrGraphAdjList GL, EdgedActivity (&criticalPath)[MAX_N])
 {
     //init
     int topoOrder[MAX_N] = {0};
@@ -97,7 +96,7 @@ void getCriticalPath(PtrGraphAdjList GL, Activity (&criticalPath)[MAX_N])
             lte = ltv[e->adjvex] - e->weight;
             if (0 == lte - ete)
             {
-                Activity a = {i, e->adjvex, e->weight};
+                EdgedActivity a = {i, e->adjvex, e->weight};
                 criticalPath[top++] = a;
             }
         }
@@ -113,6 +112,8 @@ Status topoSort(PtrGraphAdjList GL, int(&topoOrder)[MAX_N])
 void getEtvAndLtv(PtrGraphAdjList GL, const int(&topoOrder)[MAX_N], int(&etv)[MAX_N], int (&ltv)[MAX_N])
 {
     int n = GL->numVertexes;
+    
+    //figure etv
     for(int i = 0; i < n; i++)
     {
         for(EdgeNode * e = GL->adjlist[topoOrder[i]].firstedge; e != nullptr; e = e->next)
@@ -120,9 +121,15 @@ void getEtvAndLtv(PtrGraphAdjList GL, const int(&topoOrder)[MAX_N], int(&etv)[MA
             if(etv[topoOrder[i]] + e->weight > etv[e->adjvex])
                 etv[e->adjvex] = etv[topoOrder[i]] + e->weight;
         }
+    }
+
+    //figure ltv
+    ltv[n-1] = etv[n-1];
+    for(int i = 0; i < n;i++)
+    {
         for(EdgeNode * e = GL->adjlist[topoOrder[n-i]].firstedge; e != nullptr;e = e->next)
         {
-            if(ltv[topoOrder[n-i]] + e->weight > ltv[e->adjvex])
+            if(ltv[topoOrder[n-i]] > ltv[e->adjvex] - e->weight)
                 ltv[topoOrder[n-i]] = ltv[e->adjvex] - e->weight;
         }
     }
